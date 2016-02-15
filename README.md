@@ -15,7 +15,7 @@ Create a web server that can listen to requests for `/hello`, and respond with s
 Create a web server that can listen to requests for `/hello/:firstName`, and respond with some HTML that says `<h1>Hello _name_!</h1>`. For example, if a client requests `/hello/John`, the server should respond with `<h1>Hello John!</h1>`
 
 ## Exercise 3: Operations
-Create a web serverthat can listen to requests for `/op/:operation/:number1/:number2` and respond with a JSON object that looks like the following. For example, `/op/add/100/200`:
+Create a web server that can listen to requests for `/op/:operation/:number1/:number2` and respond with a JSON object that looks like the following. For example, `/op/add/100/200`:
 ```json
 {
   "operator": "add",
@@ -24,47 +24,64 @@ Create a web serverthat can listen to requests for `/op/:operation/:number1/:num
   "solution": 300
 }
 ```
-Your program should work for `add`,`sub`,`mult`,`div` and return the appropriate solution. If `operation` is something other than these 4 values, you should use [`res.sendStatus`](http://expressjs.com/4x/api.html#res.sendStatus) to send an appropriate [error code](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). First, figure out the category of error code you need to send, then find an appropriate code using the provided link.
+Your program should work for `add`,`sub`,`mult`,`div` and return the appropriate solution using `response.json` (this function will automatically `JSON.stringify` anything you give it). If `operation` is something other than these 4 values, you should use [`res.sendStatus`](http://expressjs.com/4x/api.html#res.sendStatus) to send an appropriate [error code](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). First, figure out the category of error code you need to send, then find an appropriate code using the provided link.
 
-## Exercise 4: Fetching Data!
-Create a web server that will respond to requests for `/entry/:entryId` in the following way:
-1. First, create a global variable called `entries`, which will be an object of address book entries. It could look like this:
-```javascript
-var entries = {
-  1: {
-    firstName: "John",
-    lastName: "Smith",
-    emails: [
-      {type: "home", address: "john@smith.com"},
-      {type: "work", address: "jsmith@megacorp.com"}
-    ]
-  },
-  // ...
-};
-```
-2. When the user requests a certain entry, respond with some JSON that corresponds to the requested entry.
-3. If the entry was not found, respond with an appropriate error code
+## Exercise 4: Retrieving data from our database
+Before doing this exercise, go back to your reddit clone MySQL database from the CLI. Using a few `INSERT` statements, put up a few content pieces in the `contents` table. Have at least 10-15 posts in there with various `title`s and `url`s. For the `userId`, set it to 1. Also create a user with ID 1 and call him Anonymous.
 
-## Exercise 5: searching for data
-Create a web server that will respond to requests for `/entry/search` followed by a **[query string](https://en.wikipedia.org/wiki/Query_string)**. In this case, the endpoint is static, and the query string is handled separately. The query string is of the form `?param1=value&param2=value...`. It helps to parametrize a request to receive a different output, and the parameters/values are completely arbitrary. The param/value pairs are separated by a `&`, and each pair uses `=` between the param name and value. ExpressJS **automatically** parses the query string from the full URL, and makes it available to you as the `query` property of the HTTP Request object. If not, you would have to [parse the query string manually](https://stackoverflow.com/questions/6912584/how-to-get-get-query-string-variables-in-express-js-on-node-js) inside of your request handler. This will give you back the query string as a simple JavaScript object. For example if the user requested `/entry/search?firstName=john&lastName=smith`, then you will have an object with `{firstName: "john", lastName: "smith}`.
+Once you have inserted a few contents in the database, it's now time to retrieve the contents from our web server and display them to the user using an HTML `<ul>` list with a bunch of `<li>`s.
 
-Using the input from the user, search through the `entries` and return an **array** of matching entries. Treat each query string parameter as an OR. In the example above, return all the entries where the first name contains "john" OR the last name contains "smith". For `emails`, go thru all the emails and if one of them matches then you can return that entry.
+[Using Sequelize, create a query](http://docs.sequelizejs.com/en/latest/docs/querying/) to retrieve the latest 5 contents by `createdAt` date, [including the user who created the content](http://docs.sequelizejs.com/en/latest/docs/querying/#relations-associations).
 
-## Exercise 6: receiving data
-So far, everything we have done has been thru **GET** requests (`app.get(...)`). This exercise will make you do a **POST** request instead. **The goal of this exercise** is to enable web users to ADD entries to our address book. Contrary to the more common **GET** requests, you can't easily make a browser do a **POST**. One of the ways would be building an HTML form, but here we will do something more APIy :)
+Once you have the query, create an endpoint in your Express server which will respond to `GET` requests to `/contents`. The Express server will use the Sequelize query to retrieve the array of contents. Then, you should build a string of HTML that you will send with the `request.send` function.
 
-Using Chrome, install the [Advanced REST Client](https://chrome.google.com/webstore/detail/advanced-rest-client/hgmloofddffdnphfgcellkdfbfbjeloo) extension. Using it, you'll be able to make **POST** requests easily.
+Your HTML should look like the following:
 
-Using `app.post`, create an endpoint that listens to **POST** requests to `/entry`. As a first step, inside your request handler, do a `console.log(req.body)`.
-
-Then, using the "Form" method of the Advanced REST Client, try to send a **POST** to your server and look at your console. Notice that your server receives a list of key/value pairs. While we *could* use these values to get our job done, since we're in JavaScript land we'd rather receive some JSON instead.
-
-In another step, use the "Raw" method of the Advanced REST Client, and send a **POST** to your server with some JSON in it, like this:
-
-```json
-{"firstName": "New", "lastName": "Entry"}
+```html
+<div id="contents">
+  <h1>List of contents</h1>
+  <ul class="contents-list">
+    <li class="content-item">
+      <h2 class="content-item__title">
+        <a href="http://the.post.url.value/">The content title</a>
+      </h2>
+      <p>Created by CONTENT AUTHOR USERNAME</p>
+    </li>
+    ... one <li> per content that your Sequelize query found
+  </ul>
+</div>
 ```
 
-Notice that your server receives a string of JSON. You now know that you can parse this string using `JSON.parse` in order to get back a nice JavaScript object.
+## Exercise 5: Creating a "new content" form
+In this exercise, we're going to use Express to simply send an HTML file to our user containing a `<form>`. To do this, let's write a little HTML file that looks like this:
 
-Now, after doing any validation you like, add the provided entry to your address book, giving it a unique ID. Make sure that in your response to the user, you give them back the entry they provided along with the ID you have created for it.
+```html
+<form action="/createContent" method="post">
+  <div>
+    <input type="text" name="url" placeholder="Enter a URL to content">
+  </div>
+  <div>
+    <input type="text" name="title" placeholder="Enter the title of your content">
+  </div>
+  <button type="submit">Create!</button>
+</form>
+```
+
+Save this file as `form.html` somewhere in your project. Then, using ExpressJS create a `GET` endpoint called `createContent`. We will use the [Express `res.sendFile` function](http://expressjs.com/en/api.html#res.sendFile) to serve the `form.html` file when someone requests the `/createContent` resource with a `GET`.
+
+## Exercise 6: Receiving data from our form
+In this exercise, we will write our first `POST` endpoint. The resource will be the same, `/createContent`, but we will be writing a second endpoint using `app.post` instead.
+
+In the code of `app.post('/createContent')`, we will be receiving the form data from step 5. This will get sent when the user presses the submit button. The form will instruct the browser to make a `POST` request (because of the `method`), and the resource will still be `/createContent` because of the `action` parameter.
+
+To parse this data into our request, the easiest way is to have an [ExpressJS middleware](http://expressjs.com/en/guide/using-middleware.html). Start by reading up about middleware and what they do.
+
+One particular middleware, called [Express bodyParser](https://github.com/expressjs/body-parser) can make sense of form data that is sent by a browser. Before reading the form data, you will have to install the bodyParser middleware with NPM, require it in your server code, then load it with `app.use`.
+
+Form data is sent by default using the **urlencoded** format. The documentation explains [how to make bodyParser read urlencoded request body](https://github.com/expressjs/body-parser#bodyparserurlencodedoptions). After adding this middleware, the form data will be available thru `req.body`. Start by doing a `console.log` of it to see what you get.
+
+Once you are familiar with the contents of `req.body`, use Sequelize to create a new content that has the URL and Title passed to you in the HTTP request. For the moment, set the user as being Anonymous.
+
+Once the data is inserted successfully, respond to the user with a simple "OK".
+
+If you want a challenge, try to [redirect the user to the home page](http://expressjs.com/en/api.html#res.redirect) after processing the `POST` of their form.

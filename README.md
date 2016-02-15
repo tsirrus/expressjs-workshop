@@ -3,10 +3,10 @@
 
 ## Basic instructions
 * Fork this repository and create a new Cloud9 project by cloning your fork
-* Each exercise should be done in a separate branch, **branched off of master**, with a descriptive name of your choice
-* Completed exercises should be submitted as pull requests. The pull request name should be "Exercise #: " followed by the exercise's title
+* Each exercise should be done **on master**, in a separate file called `exercise-#.js`.
+* After the first exercise, commit/push and create a pull request for your master branch so we can see your work.
 * Different exercises will require different NPM packages. This will require you to use `npm install --save` to get these packages. The `package.json` should be part of the same commit where you start using the required package(s). For example, if one of the exercises requires the use of the [`request`](https://github.com/request/request) library, then the `package.json` for that submission should contain the dependency, and it should be committed at the same time as the code that `require`s it.
-* An **`index.js`** file is made available to you. You should be able to do all the exercises by changing the contents of this file. If you feel like adding modules to make your code clearer, don't hesitate to do it. It's not *always* necessary.
+* An **`index.js`** file is made available to you. You can copy it to `exercise-#.js` as a way to get started.
 
 ## Exercise 1: Getting started!
 Create a web server that can listen to requests for `/hello`, and respond with some HTML that says `<h1>Hello World!</h1>`

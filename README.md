@@ -34,7 +34,7 @@ Before doing this exercise, go back to your reddit clone MySQL database from the
 
 Once you have inserted a few posts in the database, it's now time to retrieve the contents from our web server and display them to the user using an HTML `<ul>` list with a bunch of `<li>`s.
 
-Using something similar to your `getHomepage` function, or even directly the function itself,  retrieve the latest 5 posts by `createdAt` date, including the username who created the content.
+Using something similar to your `getAllPosts` function, or even directly the function itself,  retrieve the latest 5 posts by `createdAt` date, including the username who created the content.
 
 Once you have the query, create an endpoint in your Express server which will respond to `GET` requests to `/posts`. The Express server will use the MySQL query function to retrieve the array of contents. Then, you should build a string of HTML that you will send with the `request.send` function.
 

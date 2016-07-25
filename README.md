@@ -70,7 +70,7 @@ In this exercise, we're going to use Express to simply send an HTML file to our 
 </form>
 ```
 
-Save this file as `form.html` somewhere in your project. Then, using ExpressJS create a **`GET`** endpoint called `createContent`. We will use the [Express `res.sendFile` function](http://expressjs.com/en/api.html#res.sendFile) to serve the `form.html` file when someone requests the `/createContent` resource with a `GET`.
+You can use template strings (with backticks) to write the HTML code directly in your web server file on multiple lines. Then, using ExpressJS create a **`GET`** endpoint called `createContent`. When someone requests this URL, send the HTML form to them.
 
 ## Exercise 6: Receiving data from our form
 In this exercise, we will write our first `POST` endpoint. The resource will be the same, `/createContent`, but we will be writing a second endpoint using `app.post` instead.

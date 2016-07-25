@@ -10,7 +10,7 @@
 Create a web server that can listen to requests for `/hello`, and respond with some HTML that says `<h1>Hello World!</h1>`
 
 ## Exercise 2: A wild parameter has appeared!
-Create a web server that can listen to requests for `/hello?name=firstName`, and respond with some HTML that says `<h1>Hello _name_!</h1>`. For example, if a client requests `/hello/John`, the server should respond with `<h1>Hello John!</h1>`.
+Create a web server that can listen to requests for `/hello?name=firstName`, and respond with some HTML that says `<h1>Hello _name_!</h1>`. For example, if a client requests `/hello?name=John`, the server should respond with `<h1>Hello John!</h1>`.
 
 ## Exercise 3: Operations
 Create a web server that can listen to requests for `/calculator/:operation?num1=XX&num2=XX` and respond with a JSON object that looks like the following. For example, `/op/add?num1=31&num2=11`:

@@ -2,11 +2,10 @@
 *Your express way to the web development world!*
 
 ## Basic instructions
-* Fork this repository and create a new Cloud9 project by cloning your fork
-* Each exercise should be done **on master**, in `index.js`.
+* *Do this workshop in the same Cloud9 workspace as your Reddit API.*
 * After the first exercise, commit/push and create a pull request for your master branch so we can see your work.
 * Different exercises will require different NPM packages. This will require you to use `npm install --save` to get these packages. The `package.json` should be part of the same commit where you start using the required package(s). For example, if one of the exercises requires the use of the [`request`](https://github.com/request/request) library, then the `package.json` for that submission should contain the dependency, and it should be committed at the same time as the code that `require`s it.
-* An **`index.js`** file is made available to you. It contains the code to load the Express library and make a server that listens to the correct port for Cloud 9.
+* An **`index.js`** file is made available to you. It contains the code to load the Express library and make a server that listens to the correct port for Cloud 9. You can copy the code as an easy way to get started :)
 
 ## Exercise 1: Getting started!
 Create a web server that can listen to requests for `/hello`, and respond with some HTML that says `<h1>Hello World!</h1>`

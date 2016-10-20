@@ -50,7 +50,7 @@ Your HTML should look like the following:
       </h2>
       <p>Created by CONTENT AUTHOR USERNAME</p>
     </li>
-    ... one <li> per content that your Sequelize query found
+    ... one <li> per content that your SQL query found
   </ul>
 </div>
 ```
@@ -70,7 +70,7 @@ In this exercise, we're going to use Express to simply send an HTML file to our 
 </form>
 ```
 
-You can use template strings (with backticks) to write the HTML code directly in your web server file on multiple lines. Then, using ExpressJS create a **`GET`** endpoint called `createContent`. When someone requests this URL, send the HTML form to them.
+You can use template strings (with backticks) to write the HTML code directly in your web server file on multiple lines. Then, using ExpressJS create a **`GET`** endpoint called `createContent`. When someone requests this URL, send the HTML form to them as a string with `res.send`.
 
 ## Exercise 6: Receiving data from our form
 In this exercise, we will write our first `POST` endpoint. The resource will be the same, `/createContent`, but we will be writing a second endpoint using `app.post` instead.
@@ -83,7 +83,7 @@ One particular middleware, called [Express bodyParser](https://github.com/expres
 
 Form data is sent by default using the **urlencoded** format. The documentation explains [how to make bodyParser read urlencoded request body](https://github.com/expressjs/body-parser#bodyparserurlencodedoptions). After adding this middleware, the form data will be available thru `req.body`. Start by doing a `console.log` of it to see what you get.
 
-Once you are familiar with the contents of `req.body`, use a version of your `createPost` MySQL function to create a new post that has the URL and Title passed to you in the HTTP request. For the moment, set the user as being ID#1, or "John Smith".
+Once you are familiar with the contents of `req.body`, use your `createPost` function from RedditAPI to create a new post that has the URL and Title passed to you in the HTTP request. For the moment, set the user as being ID#1, or "John Smith".
 
 Once the data is inserted successfully, you have a few choices of what to do in your callback:
 
@@ -91,3 +91,93 @@ Once the data is inserted successfully, you have a few choices of what to do in 
 2. Use `response.send` to send the actual post object that was created (received from the `createPost` function)
 3. Use `response.redirect` to send the user back to the `/posts` page you setup in a previous exercise
 4. **challenge :)** Using a `response.redirect`, redirect the user to the URL `/posts/:ID` where `:ID` is the ID of the newly created post. This is more challenging because now you have to implement the `/posts/:ID` URL! See if you can do that and return a single post only.
+
+## Exercise 7: Using a template engine
+Tomorrow, we will learn about ExpressJS template engines in class. Template engines are useful if we want to send some HTML to the browser, which is often the case in a regular web server.
+
+The simplest way to send HTML to the browser is to use `response.send`, and pass it a string of HTML. This is what you had to do for exercises 4 and 5, and it has a few disadvantages:
+
+  * The HTML is mixed up with the web server code, which is less than ideal. It makes it harder to see the logic of the web server.
+  * Generating dynamic HTML can be tedious and error-prone: you have to do string concatenation, close your tags properly, and be sure to escape your HTML to avoid injection attacks.
+  * Every time you want to change the HTML code, you have to restart your web server. While this may not be a huge issue, it can be avoided if the HTML is in a separate file.
+
+There exist tons of different template engines that work with Express. The idea behind a template engine is super simple: it's a function that takes some data, and returns some text -- most often HTML -- based on the so-called template. The difference between the various template engines that exist is the syntax they use for expressing the transformation of data to HTML.
+
+Once you know one or two template languages, learning new ones is quite easy. For this course, we're going to use the [Pug template engine](http://pugjs.org), which was previously known as Jade.
+
+The goal of this exercise is to practice writing Pug templates, to get us ready for our big Reddit Clone project. To do this, we're going to use Pug to refactor exercises 4 and 5.
+
+Here are the steps to follow:
+
+  1. From your terminal, install the `pug` NPM package.
+  2. From your `index.js` file, set Express to use the Pug engine by adding the following line:
+
+  ```js
+  app.set('view engine', 'pug');
+  ```
+  3. In your project, create a directory called `views`. This is where Express will look for your templates.
+  4. Create a new file called `create-content.pug` in the `views` directory.
+  5. Paste the following content in the file:
+
+  ```pug
+  form(action="/createContent", method="POST")
+    div
+      input(type="text", name="url", placeholder="Enter a URL to content")
+    div
+      input(type="text", name="title", placeholder="Enter the title of your content")
+    button(type="submit") Create!
+  ```
+  6. Notice how the Pug code is much shorter than its HTML counterpart? This is because Pug uses indentation rather than opening and closing tags. This template actually has no dynamic parts to it, but it's still nicer to write it than the HTML document, and it's separated from the web server code!
+  7. In your `app.get('/createContent')` code, remove all the HTML you created, as well as the `res.send`. Replace them with the following single line of code:
+
+  ```js
+  res.render('create-content');
+  ```
+  8. Restart your web server and verify that you are getting the same HTML.
+  9. Let's do the same thing for Exercise 4. This time, we have some dynamic data. We will need to loop through the array of posts and display it using a Pug template.
+    1. Read the [documentation on iteration with Pug](https://pugjs.org/language/iteration.html). We're interested in the `each` loop here. Make sure you understand how it works.
+    2. In your web server code, inside the `app.get('/posts')` code, replace the manual rendering with a call like this:
+
+      ```js
+      res.render('post-list', {posts: posts});
+      ```
+    3. In your views directory, create a file called `post-list.pug` and try to recreate the same output as you did with HTML. You will have access to a variable called `posts`, that will have been transmitted by the call to `render`. You will need to use the `each` functionality of Pug to do this.
+
+## Exercise 8: Layouts
+This exrcise expands on the previous one. In the previous exercise, we saw how to generate dynamic HTML by using a template engine. This is great, but normally we have to send a **full HTML page** rather than a part of a page.
+
+Pug lets us do this using [inheritance](https://pugjs.org/language/inheritance.html). We start by defining a "layout", which is simply a template with some placeholders. Then, when we render our main template -- the one you created in the previous exercise -- we specify how the placeholders should be filled in.
+
+For this exercise, we're going to create a basic layout. In your `views` directory, create a file called `layout.pug` with the following content:
+
+```pug
+doctype html
+html
+  head
+    meta(charset="utf-8")
+    block title
+      title The Default Title
+  body
+    block content
+```
+
+Then, modify your `post-list.pug` from the previous step to use this layout. To do this, you'll have to add one `extends` line at the top of your file, and move the rest of the template inside a block. If you are unsure how to do this, make sure to read the documentation about [extends](https://pugjs.org/language/extends.html) and inheritance.
+
+Hint: This should not be more complicated than adding a line or two, and indenting some code!
+
+## CHALLENGE: Let's add a bit of CSS!
+Now that you have a layout for your "site", you should easily be able to include a CSS file :)
+
+In the `head` section of your layout, add the following line:
+
+```pug
+link, (rel="stylesheet", href="/files/styles.css")
+```
+
+That was the easy part. If you have done this correctly, when you refresh the `/posts` page your browser will try to load a file `/files/styles.css` from your web server. This will result in a 404 error, because your server doesn't know how to respond to this request -- yet!
+
+In your project, create a directory called `static_files`, and inside create an empty file called `styles.css`.
+
+Now we have to figure out how to make your web server serve this file. Tomorrow, we will learn about ExpressJS middleware, functions that can respond to requests without any intervention from your part. One such middleware is the [static middleware](https://expressjs.com/en/starter/static-files.html). You can point it to a directory on your computer, and it will automatically "`res.send`" any file that is requested from this directory.
+
+For this challenge, you have to figure out by yourself how to add the static middleware to your web server. Your middleware should only be active if the URL starts with `/files`, and it should look in the `static_files` directory for any file that matches. This way, when your browser requests the URL `/files/styles.css`, your middleware should be able to send the file called `styles.css` under the `static_files` directory. Note that the name of the directory and the path prefix in the URL are not related to each other.

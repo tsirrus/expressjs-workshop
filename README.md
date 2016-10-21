@@ -62,7 +62,7 @@ Your HTML should look like the following:
 ```
 
 ## Exercise 5: Creating a "new content" form
-In this exercise, we're going to use Express to simply send an HTML file to our user containing a `<form>`. To do this, let's write a little HTML file that looks like this:
+In this exercise, we're going to use Express to simply send an HTML file to our user containing a `<form>`. To do this, let's write a little HTML form that looks like this:
 
 ```html
 <form action="/createContent" method="POST"> <!-- what is this method="POST" thing? you should know, or ask me :) -->
@@ -77,6 +77,8 @@ In this exercise, we're going to use Express to simply send an HTML file to our 
 ```
 
 You can use template strings (with backticks) to write the HTML code directly in your web server file on multiple lines. Then, using ExpressJS create a **`GET`** endpoint called `createContent`. When someone requests this URL, send the HTML form to them as a string with `res.send`.
+
+:warning: This exercise is EASY. Don't look too much into it. It's only a preparation for the next exercise. It's almost as easy as exercise 1. All you have to do is send some static HTML as a response.
 
 ## Exercise 6: Receiving data from our form
 In this exercise, we will write our first `POST` endpoint. The resource will be the same, `/createContent`, but we will be writing a second endpoint using `app.post` instead.

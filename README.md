@@ -179,7 +179,7 @@ Now that you have a layout for your "site", you should easily be able to include
 In the `head` section of your layout, add the following line:
 
 ```pug
-link, (rel="stylesheet", href="/files/styles.css")
+link(rel="stylesheet", href="/files/styles.css")
 ```
 
 That was the easy part. If you have done this correctly, when you refresh the `/posts` page your browser will try to load a file `/files/styles.css` from your web server. This will result in a 404 error, because your server doesn't know how to respond to this request -- yet!

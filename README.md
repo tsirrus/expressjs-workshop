@@ -9,10 +9,15 @@
 ## Exercise 1: Getting started!
 Create a web server that can listen to requests for `/hello`, and respond with some HTML that says `<h1>Hello World!</h1>`
 
-## Exercise 2: A wild parameter has appeared!
+## Exercise 2: A wild query has appeared!
 Create a web server that can listen to requests for `/hello?name=firstName`, and respond with some HTML that says `<h1>Hello _name_!</h1>`. For example, if a client requests `/hello?name=John`, the server should respond with `<h1>Hello John!</h1>`.
 
-**REMEMBER: THE QUERY STRING IS NOT PART OF THE RESOURCE PATH THAT YOU ARE FILTERING WITH EXPRESS**
+**REMEMBER: THE QUERY STRING IS NOT PART OF THE RESOURCE PATH THAT YOU ARE FILTERING WITH EXPRESS, JUST USE THE SAME `app.get('/hello')` AS EX 1**
+
+## Exercise 2B: A wild param has appeared!
+For this exercise, we will do the same thing as exercise 2 but with a URL parameter rather than a query string parameter. You will have to create a new `app.get` handler, and the code inside will be a tiny bit different from exercise 2.
+
+There is however a conceptual difference between a query string parameter and a URL parameter. A URL parameter is part of the resource, and is usually required. Together with the fixed part of the URL, it represents a resource. In contrast, a query string parameter is more like the parameters of a function. Sometimes it's optional, and it doesn't define a specific resource by itself. We'll talk more about this in the coming days.
 
 ## Exercise 3: Operations
 Create a web server that can listen to requests for `/calculator/:operation?num1=XX&num2=XX` and respond with a JSON object that looks like the following. For example, `/op/add?num1=31&num2=11`:

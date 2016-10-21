@@ -32,14 +32,15 @@ Create a web server that can listen to requests for `/calculator/:operation?num1
 
 **NOTE**: **query string parameters** -- the part after the `?` in a URL -- are different conceptually from the **request parameters**, which are part of the path. For example here you are asked to use `:operation` as request parameter. In express, you do this by making your `app.get('/op/:operation', ...)`. The `:` before `operation` will tell Express that this is a **request parameter**. You can access it using the `request.params` object instead of `request.query` which would be for the query string. In general, while the query string is reserved for either optional values or values that can vary wildly, we will use request parameters when they can themselves represent a resource. Here, we are looking for the `calculator` resource, and under it for the `add` "sub-resource". Of course this is our own terminology and in general it's up to us to decide what our URL schema represents.
 
-Your program should work for `add`,`sub`,`mult`,`div` and return the appropriate solution in a JSON string. If `operation` is something other than these 4 values, you should use [`res.status`](http://expressjs.com/4x/api.html#res.status) to send an appropriate [error code](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). First, figure out the category of error code you need to send, then find an appropriate code using the provided link.
+Your program should work for `add`,`sub`,`mult`,`div` and return the appropriate solution in a JSON string. If `operation` is 
+other than these 4 values, you should use [`res.status`](http://expressjs.com/4x/api.html#res.status) to send an appropriate [error code](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). First, figure out the category of error code you need to send, then find an appropriate code using the provided link.
 
 ## Exercise 4: Retrieving data from our database
 Before doing this exercise, go back to your reddit clone MySQL database from the CLI. Using a few `INSERT` statements, put up a few posts in the `posts` table. Have at least 10-15 posts in there with various `title`s and `url`s. For the `userId`, set it to 1. Also create a user with ID 1 and call him John Smith or something.
 
 Once you have inserted a few posts in the database, it's now time to retrieve the contents from our web server and display them to the user using an HTML `<ul>` list with a bunch of `<li>`s.
 
-Using something similar to your `getAllPosts` function, or even directly the function itself,  retrieve the latest 5 posts by `createdAt` date, including the username who created the content.
+Using your `getAllPosts` function from RedditAPI, retrieve the latest 5 posts by `createdAt` date, including the username who created the content.
 
 Once you have the query, create an endpoint in your Express server which will respond to `GET` requests to `/posts`. The Express server will use the MySQL query function to retrieve the array of contents. Then, you should build a string of HTML that you will send with the `request.send` function.
 

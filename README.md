@@ -189,3 +189,6 @@ In your project, create a directory called `static_files`, and inside create an 
 Now we have to figure out how to make your web server serve this file. Tomorrow, we will learn about ExpressJS middleware, functions that can respond to requests without any intervention from your part. One such middleware is the [static middleware](https://expressjs.com/en/starter/static-files.html). You can point it to a directory on your computer, and it will automatically "`res.send`" any file that is requested from this directory.
 
 For this challenge, you have to figure out by yourself how to add the static middleware to your web server. Your middleware should only be active if the URL starts with `/files`, and it should look in the `static_files` directory for any file that matches. This way, when your browser requests the URL `/files/styles.css`, your middleware should be able to send the file called `styles.css` under the `static_files` directory. Note that the name of the directory and the path prefix in the URL are not related to each other.
+
+## You are too good for this!
+Well, it seems like the day has not ended and you finished everything. Watch this [course from Google on Client-Server communication on Udacity](https://classroom.udacity.com/courses/ud897) to advance your understanding of HTTP!

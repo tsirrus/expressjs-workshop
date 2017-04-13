@@ -4,26 +4,20 @@
 ## Basic instructions
 * :warning: :warning: **Do this workshop in the same Cloud9 workspace as your Reddit API.**
 * Different exercises will require different NPM packages. This will require you to use `npm install --save` to get these packages.
-* An **`index.js`** file is made available to you. It contains the code to load the Express library and make a server that listens to the correct port for Cloud 9. You can copy the code as an easy way to get started :)
+* An **`index.js`** file is made available to you. It contains the code to load the Express library and make a server that listens to the correct port for Cloud 9. You can copy the code as an easy way to get started.
 
 ## Exercise 1: Getting started!
-Create a web server that can listen to requests for `/hello`, and respond with some HTML that says `<h1>Hello World!</h1>`
+Add an endpoint `/hello` to your web server. Make it return the HTML string `<h1>Hello World!</h1>`.
 
 ## Exercise 2: A wild query has appeared!
-Create a web server that can listen to requests for `/hello?name=firstName`, and respond with some HTML that says `<h1>Hello _name_!</h1>`. For example, if a client requests `/hello?name=John`, the server should respond with `<h1>Hello John!</h1>`.
-
-**REMEMBER: THE QUERY STRING IS NOT PART OF THE RESOURCE PATH THAT YOU ARE FILTERING WITH EXPRESS, JUST USE THE SAME `app.get('/hello')` AS EX 1**
-
-## Exercise 2B: A wild param has appeared!
-For this exercise, we will do the same thing as exercise 2 but with a URL parameter rather than a query string parameter. You will have to create a new `app.get` handler, and the code inside will be a tiny bit different from exercise 2.
-
-There is however a conceptual difference between a query string parameter and a URL parameter. A URL parameter is part of the resource, and is usually required. Together with the fixed part of the URL, it represents a resource. In contrast, a query string parameter is more like the parameters of a function. Sometimes it's optional, and it doesn't define a specific resource by itself. We'll talk more about this in the coming days.
+Improve your `/hello` endpoint so that if it's called as `/hello?name=John`, the response will be `<h1>Hello John</h1>`. If no `name` query string parameter is provided, keep doing the same thing as exercise 1.
 
 ## Exercise 3: Operations
-Create a web server that can listen to requests for `/calculator/:operation?num1=XX&num2=XX` and respond with a JSON object that looks like the following. For example, `/op/add?num1=31&num2=11`:
+Add an endpoint `/calculator/:operation` to your web server. The valid values for `:operation` are `add` and `multiply`. This endpoint will also accept query string parameters `num1` and `num2`. If they are not passed, they should be set to `0`. This endpoint should return a JSON string like this:
+
 ```json
 {
-  "operator": "add",
+  "operation": "add",
   "firstOperand": 31,
   "secondOperand": 11,
   "solution": 42
@@ -32,76 +26,70 @@ Create a web server that can listen to requests for `/calculator/:operation?num1
 
 **NOTE**: **query string parameters** -- the part after the `?` in a URL -- are different conceptually from the **request parameters**, which are part of the path. For example here you are asked to use `:operation` as request parameter. In express, you do this by making your `app.get('/op/:operation', ...)`. The `:` before `operation` will tell Express that this is a **request parameter**. You can access it using the `request.params` object instead of `request.query` which would be for the query string. In general, while the query string is reserved for either optional values or values that can vary wildly, we will use request parameters when they can themselves represent a resource. Here, we are looking for the `calculator` resource, and under it for the `add` "sub-resource". Of course this is our own terminology and in general it's up to us to decide what our URL schema represents.
 
-Your program should work for `add`,`sub`,`mult`,`div` and return the appropriate solution in a JSON string. If `operation` is 
-other than these 4 values, you should use [`res.status`](http://expressjs.com/4x/api.html#res.status) to send an appropriate [error code](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). First, figure out the category of error code you need to send, then find an appropriate code using the provided link.
+If `:operation` is anything other than `add` or `multiply`, you should use [`res.status`](http://expressjs.com/4x/api.html#res.status) to send an appropriate [error code](http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html). First, figure out the category of error code you need to send, then find an appropriate code using the provided link.
 
 ## Exercise 4: Retrieving data from our database
-Before doing this exercise, go back to your reddit clone MySQL database from the CLI. Using a few `INSERT` statements, put up a few posts in the `posts` table. Have at least 10-15 posts in there with various `title`s and `url`s. For the `userId`, set it to 1. Also create a user with ID 1 and call him John Smith or something.
+The goal of this exercise is to create an endpoint `/posts` that retrieves the contents of the `posts` table of your `reddit` database using the `getAllPosts` function you created in the previous workshop, and display them to the user using an HTML `<ul>` list.
 
-Once you have inserted a few posts in the database, it's now time to retrieve the contents from our web server and display them to the user using an HTML `<ul>` list with a bunch of `<li>`s.
+As a first step, you'll have to load up the `RedditAPI` constructor and create a new instance. To do this you'll also need to setup a database connection in your web server file so you can pass it to the `RedditAPI` constructor.
 
-Using your `getAllPosts` function from RedditAPI, retrieve the latest 5 posts by `createdAt` date, including the username who created the content.
-
-Once you have the query, create an endpoint in your Express server which will respond to `GET` requests to `/posts`. The Express server will use the MySQL query function to retrieve the array of contents. Then, you should build a string of HTML that you will send with the `request.send` function.
+Using your `getAllPosts` function from RedditAPI, retrieve the latest posts. Then, you should build a string of HTML that you will send with the `request.send` function.
 
 Your HTML should look like the following:
 
 ```html
-<div id="contents">
-  <h1>List of contents</h1>
-  <ul class="contents-list">
-    <li class="content-item">
-      <h2 class="content-item__title">
-        <a href="http://the.post.url.value/">The content title</a>
+<div id="posts">
+  <h1>List of posts</h1>
+  <ul class="posts-list">
+    <li class="post-item">
+      <h2 class="post-item__title">
+        <a href="http://the.post.url.value/">The title of the post</a>
       </h2>
-      <p>Created by CONTENT AUTHOR USERNAME</p>
+      <p>Created by Username</p>
     </li>
-    ... one <li> per content that your SQL query found
+    <!-- ... one <li> per post that getAllPosts returned -->
   </ul>
 </div>
 ```
 
-## Exercise 5: Creating a "new content" form
-In this exercise, we're going to use Express to simply send an HTML file to our user containing a `<form>`. To do this, let's write a little HTML form that looks like this:
+To build this string of HTML manually is quite cumbersome, and we will see a better way to do it later.
+
+## Exercise 5: Creating a "new post" HTML form
+In this exercise, we're going to create an endpoint `/new-post` that will simply send an HTML `<form>`. Here's the code for the HTML form:
 
 ```html
-<form action="/createContent" method="POST"> <!-- what is this method="POST" thing? you should know, or ask me :) -->
-  <div>
+<form action="/createPost" method="POST"><!-- why does it say method="POST" ?? -->
+  <p>
     <input type="text" name="url" placeholder="Enter a URL to content">
-  </div>
-  <div>
+  </p>
+  <p>
     <input type="text" name="title" placeholder="Enter the title of your content">
-  </div>
+  </p>
   <button type="submit">Create!</button>
 </form>
 ```
 
-You can use template strings (with backticks) to write the HTML code directly in your web server file on multiple lines. Then, using ExpressJS create a **`GET`** endpoint called `createContent`. When someone requests this URL, send the HTML form to them as a string with `res.send`.
-
-:warning: This exercise is EASY. Don't look too much into it. It's only a preparation for the next exercise. It's almost as easy as exercise 1. All you have to do is send some static HTML as a response.
+:warning: This exercise is EASY. Don't look too much into it. It's only a preparation for the next exercise. It's almost as easy as exercise 1. All you have to do is send an HTML string as a response.
 
 ## Exercise 6: Receiving data from our form
-In this exercise, we will write our first `POST` endpoint. The resource will be the same, `/createContent`, but we will be writing a second endpoint using `app.post` instead.
+In this exercise, we will write our first `POST` endpoint, `/createPost`.
 
-In the code of `app.post('/createContent')`, we will be receiving the form data from step 5. This will get sent by the browser when the user presses the submit button. The form will instruct the browser to make a `POST` request (because of the `method`), and the resource will be `/createContent` because of the `action` parameter.
+In the code of `app.post('/createPost')`, we will be receiving the form data from step 5. This data will be sent by the browser when the user presses the submit button. The form will instruct the browser to make a `POST` request (because of the `method`), and the resource will be `/createPost` because of the `action` parameter.
 
-To parse this data into our request, the easiest way is to have an [ExpressJS middleware](http://expressjs.com/en/guide/using-middleware.html). Start by reading up about middleware and what they do. We will talk about them more in detail in further lectures.
+The way a browser submits a form is by taking all the `<input>`s in the form, finding their values, and building a query string automatically. If the `method` is set to `GET`, the query string will be added to the end of the `action` URL with a `?`. If the `method` is `POST`, the query string will be sent as the **request body**. The request body is not apparent directly in the browser window, but you can see it if you open your Dev Tools.
 
-One particular middleware, called [Express bodyParser](https://github.com/expressjs/body-parser) can make sense of form data that is sent by a browser. Before reading the form data, you will have to install the bodyParser middleware with NPM, require it in your server code, then load it with `app.use`.
+In a previous exercise, you were able to retrieve data from the query string by accessing the `request.query` object. This object is automatically created by Express if there is a query string in the URL. Request bodies do not get parsed automatically by Express. The easiest way to parse the request body is to use an [ExpressJS middleware](http://expressjs.com/en/guide/using-middleware.html). Start by reading up about middleware and what they do. We will talk about them more in detail in further lectures.
 
-Form data is sent by default using the **urlencoded** format. The documentation explains [how to make bodyParser read urlencoded request body](https://github.com/expressjs/body-parser#bodyparserurlencodedoptions). After adding this middleware, the form data will be available thru `req.body`. Start by doing a `console.log` of it to see what you get.
+The [bodyParser](https://github.com/expressjs/body-parser) middleware can parse the request body that is sent by a browser. Before reading the form data, you will have to install the `body-parser` middleware with NPM, `require` it in your server code, then load it with `app.use`.
 
-Once you are familiar with the contents of `req.body`, use your `createPost` function from RedditAPI to create a new post that has the URL and Title passed to you in the HTTP request. For the moment, set the user as being ID#1, or "John Smith".
+Form data is sent by default using the **urlencoded** format. The documentation explains [how to make bodyParser read urlencoded request body](https://github.com/expressjs/body-parser#bodyparserurlencodedoptions). After adding this middleware, the form data will be available as `request.body`. It will be an object that contains the data submitted by the browser.
 
-Once the data is inserted successfully, you have a few choices of what to do in your callback:
+Once you are familiar with the contents of `request.body`, use the `createPost` function from RedditAPI to create a new post that has the URL and Title passed to you in the HTTP request. Since you don't have a user system yet, set the `userId` to `1` when you call `createPost`.
 
-1. Use `response.send("OK")` to tell the browser that everything went well
-2. Use `response.send` to send the actual post object that was created (received from the `createPost` function)
-3. Use `response.redirect` to send the user back to the `/posts` page you setup in a previous exercise
-4. **challenge :)** Using a `response.redirect`, redirect the user to the URL `/posts/:ID` where `:ID` is the ID of the newly created post. This is more challenging because now you have to implement the `/posts/:ID` URL! See if you can do that and return a single post only.
+Once the data is inserted successfully, use `response.redirect` to send the user back to the `/posts` page you setup in a previous exercise.
 
 ## Exercise 7: Using a template engine
-Tomorrow, we will learn about ExpressJS template engines in class. Template engines are useful if we want to send some HTML to the browser, which is often the case in a regular web server.
+Tomorrow, we will learn about ExpressJS template engines in class. Template engines are useful if we want to send HTML.
 
 The simplest way to send HTML to the browser is to use `response.send`, and pass it a string of HTML. This is what you had to do for exercises 4 and 5, and it has a few disadvantages:
 
@@ -109,7 +97,7 @@ The simplest way to send HTML to the browser is to use `response.send`, and pass
   * Generating dynamic HTML can be tedious and error-prone: you have to do string concatenation, close your tags properly, and be sure to escape your HTML to avoid injection attacks.
   * Every time you want to change the HTML code, you have to restart your web server. While this may not be a huge issue, it can be avoided if the HTML is in a separate file.
 
-There exist tons of different template engines that work with Express. The idea behind a template engine is super simple: it's a function that takes some data, and returns some text -- most often HTML -- based on the so-called template. The difference between the various template engines that exist is the syntax they use for expressing the transformation of data to HTML.
+There exist tons of different template engines that work with Express. The idea behind a template engine is super simple: it's a function that takes some data -- usually an object --, and returns HTML based on the so-called template. The difference between the various template engines that exist is the syntax they use for expressing the transformation of data to HTML.
 
 Once you know one or two template languages, learning new ones is quite easy. For this course, we're going to use the [Pug template engine](http://pugjs.org), which was previously known as Jade.
 
@@ -123,15 +111,15 @@ Here are the steps to follow:
   ```js
   app.set('view engine', 'pug');
   ```
-  3. In your project, create a directory called `views`. This is where Express will look for your templates.
+  3. In your project root, create a directory called `views`. This is where Express will look for your templates.
   4. Create a new file called `create-content.pug` in the `views` directory.
   5. Paste the following content in the file:
 
   ```pug
   form(action="/createContent", method="POST")
-    div
+    p
       input(type="text", name="url", placeholder="Enter a URL to content")
-    div
+    p
       input(type="text", name="title", placeholder="Enter the title of your content")
     button(type="submit") Create!
   ```

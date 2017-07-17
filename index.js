@@ -1,3 +1,10 @@
+'use strict';
+// reddit API
+var RedditAPI = require('../reddit-nodejs-api/reddit');
+// DB + comm
+var request = require('request-promise');
+var mysql = require('promise-mysql');
+// Web
 var express = require('express');
 var app = express();
 
@@ -45,7 +52,41 @@ app.get('/calculator/:operation', function(request, response) {
     response.end(JSON.stringify(solutionObject, null, 2));
 });
 
+app.get('/posts', function(request, response) {
+  var connection = mysql.createPool({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database: 'reddit',
+    connectionLimit: 10
+  });
 
+  // create a RedditAPI object. we will use it to insert new data
+  var myReddit = new RedditAPI(connection);
+  var myHTMLString = `
+  <div id="posts">
+    <h1>List of posts</h1>
+    <ul class="posts-list">
+  `;
+  myReddit.getAllPosts()
+  .then(dbPosts => {
+    dbPosts.forEach(post => {
+      myHTMLString += `
+      <li class="post-item">
+      <h2 class="post-item__title">
+      <a href=`+ post.url + `>`+ post.title + `</a>
+      </h2>
+      <p>Created by ` + post.user.username + `</p>
+      </li>`;
+    });
+  })
+  .then(result => {
+    myHTMLString += `
+    </ul>
+    </div>`;
+    response.end(myHTMLString);
+  });
+});
 
 /* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */
 

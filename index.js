@@ -6,6 +6,9 @@ app.get('/', function (req, res) {
 });
 
 app.get('/hello', function(request,response) {
+  if (request.query.name !== undefined) {
+    response.end("<h1>Hello " + request.query.name + "</h1>");
+  }
   response.end('<h1>Hello World!</h1>');
 });
 

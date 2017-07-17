@@ -6,7 +6,12 @@ var request = require('request-promise');
 var mysql = require('promise-mysql');
 // Web
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
+
+// create application/x-www-form-urlencoded parser
+var urlencodedParser = bodyParser.urlencoded({ extended: false })
+
 
 app.get('/', function (req, res) {
   res.send('Hello World!');
@@ -85,8 +90,46 @@ app.get('/posts', function(request, response) {
     </ul>
     </div>`;
     response.end(myHTMLString);
-  });
+  })
 });
+
+app.get('/new-post', function(request, response) {
+  var formHTML = `<!DOCTYPE html>
+  <form action="/createPost" method="POST"><!-- why does it say method="POST" ?? -->
+    <p>
+      <input type="text" name="url" placeholder="Enter a URL to content">
+    </p>
+    <p>
+      <input type="text" name="title" placeholder="Enter the title of your content">
+    </p>
+    <button type="submit">Create!</button>
+  </form>`;
+  response.end(formHTML);
+});
+
+app.post('/createPost', urlencodedParser, function(request, response) {
+  if (request.body) {
+    var connection = mysql.createPool({
+      host     : 'localhost',
+      user     : 'root',
+      password : '',
+      database: 'reddit',
+      connectionLimit: 10
+    });
+
+    // create a RedditAPI object. we will use it to insert new data
+    var myReddit = new RedditAPI(connection);
+    var myPost = {
+      subredditId: 1,
+      userId: 1,
+      title: request.body.title,
+      url: request.body.url
+    };
+    myReddit.createPost(myPost)
+    .then(response.redirect('/posts'));
+  }
+});
+
 
 /* YOU DON'T HAVE TO CHANGE ANYTHING BELOW THIS LINE :) */
 

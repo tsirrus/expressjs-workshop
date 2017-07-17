@@ -89,8 +89,8 @@ app.get('/posts', function(request, response) {
     myHTMLString += `
     </ul>
     </div>`;
-    response.end(myHTMLString);
-  })
+    response.send(myHTMLString);
+  });
 });
 
 app.get('/new-post', function(request, response) {
@@ -104,7 +104,7 @@ app.get('/new-post', function(request, response) {
     </p>
     <button type="submit">Create!</button>
   </form>`;
-  response.end(formHTML);
+  response.send(formHTML);
 });
 
 app.post('/createPost', urlencodedParser, function(request, response) {

@@ -7,11 +7,13 @@ var mysql = require('promise-mysql');
 // Web
 var express = require('express');
 var bodyParser = require('body-parser');
+var pug = require('pug');
 var app = express();
 
 // create application/x-www-form-urlencoded parser
-var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var urlencodedParser = bodyParser.urlencoded({ extended: false });
 
+app.set('view engine', 'pug');
 
 app.get('/', function (req, res) {
   res.send('Hello World!');
@@ -93,6 +95,21 @@ app.get('/posts', function(request, response) {
   });
 });
 
+app.get('/post-list', function (request, response) {
+  var connection = mysql.createPool({
+    host     : 'localhost',
+    user     : 'root',
+    password : '',
+    database: 'reddit',
+    connectionLimit: 10
+  });
+  var myReddit = new RedditAPI(connection);
+  myReddit.getAllPosts()
+  .then(posts => {
+    response.render('post-list', {posts: posts});
+  });
+});
+
 app.get('/new-post', function(request, response) {
   var formHTML = `<!DOCTYPE html>
   <form action="/createPost" method="POST"><!-- why does it say method="POST" ?? -->
@@ -105,6 +122,10 @@ app.get('/new-post', function(request, response) {
     <button type="submit">Create!</button>
   </form>`;
   response.send(formHTML);
+});
+
+app.get('/createContent', function(request, response) {
+  response.render('create-content');
 });
 
 app.post('/createPost', urlencodedParser, function(request, response) {
